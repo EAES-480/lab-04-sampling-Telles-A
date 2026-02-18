@@ -12,7 +12,7 @@ output:
     code_folding: hide
     df_print: paged
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -75,13 +75,15 @@ This dataset uses **Year + Day-of-Year (DOY)**. Month must be derived from a cal
 
 ```{r derive_time, echo=TRUE, eval=FALSE}
 df <- df %>%
+  filter(daytime != -9999, 
+        doy != -9999) %>%
   mutate(
     # TODO: create a Date column from year_local and doy
     # HINT: Jan 1 is DOY = 1, so use (doy - 1) with origin = "YYYY-01-01"
-    date = as.Date(___ - 1, origin = paste0(___, "-01-01")),
+    date = as.Date(doy - 1, origin = paste0(year_local, "-01-01")),
 
     # TODO: create a month column (numeric 1–12 or labeled months)
-    month = month(___, label = TRUE, abbr = TRUE),
+    month = month(date, label = TRUE, abbr = TRUE),
 
     # TODO: make a day/night label using daytime (0/1)
     day_night = if_else(daytime == 1, "Day", "Night")
@@ -104,20 +106,20 @@ Examples you can choose from (depending on what you see in the dataset):
 
 ```{r choose_response, echo=TRUE, eval=FALSE}
 # TODO: choose ONE response variable (a column name as a string)
-response_var <- "gpp"   # replace "gpp" with your choice, e.g. "fc" or "le" or "ta"
+response_var <- "ta"   # replace "gpp" with your choice, e.g. "fc" or "le" or "ta"
 
 # CHECK: print a quick summary
 df %>% summarise(
   n = n(),
-  n_missing = sum(is.na(____)),
-  mean = mean(____, na.rm = TRUE),
-  sd = sd(____, na.rm = TRUE)
+  n_missing = sum(is.na(response_var)),
+  mean = mean(response_var, na.rm = TRUE),
+  sd = sd(response_var, na.rm = TRUE)
 )
 ```
 
 **Prompt (2–3 sentences):** Why did you choose this response variable? What do you expect its seasonality/day–night pattern to be?
 
-> *Write your answer here.*
+> I chose air temperature for my response variable because it is a simple environmental process to understand. Usually, it is colder at night and warmer during the day so I expect to see that pattern. For seasonality, because it the data is taken from Chicago, I would expect to see lower temperatures during the winter/fall months and higher temperatures during the spring/summer. 
 
 ---
 
@@ -130,11 +132,11 @@ Fill in at least **5 variables** from this dataset:
 
 | Variable | Units | Description | Expected sign/seasonality? |
 |----------|-------|-------------|----------------------------|
-|          |       |             |                            |
-|          |       |             |                            |
-|          |       |             |                            |
-|          |       |             |                            |
-|          |       |             |                            |
+|gpp      | µmolCO2 m-2 s-1 |Gross Primary Productivity|seasonal and daily cycle|
+|ta       |Celcious|air temperature|seasonal and daily cycle|
+|reco     |µmolCO2 m-2 s-1|Ecosystem Respiration|seasonal and daily cycle|
+|nee      |µmolCO2 m-2 s-1|Net Ecosystem Exchange|seasonal and daily cycle|
+|swc      |percentage|Soil water content (volumetric), range 0-100|seasonal cycle(more melt and precipitation in spring)|
 
 ---
 
@@ -149,7 +151,7 @@ Remember: for this lab, the **population** is the entire 2023 half-hourly time s
 # TODO: pick a y aesthetic using response_var.
 
 df %>%
-  ggplot(aes(x = date, y = ____)) +
+  ggplot(aes(x = date, y = ta)) +
   geom_line(alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(
@@ -161,8 +163,7 @@ df %>%
 
 **Prompt (2–3 sentences):** What major patterns do you see? (Seasonal cycle? Daily cycle? Outliers?)
 
-> *Write your answer here.*
-
+> As expected, there are lower temperatures in January, then begin to rise closer to July, and drop again after October. There is also a daily cycle pattern that can be seen from each individual day. There seems to be a gap in the data before July 2023 that could be from a coding error. 
 ---
 
 ## 2.2 Population distribution (histogram + density)
@@ -171,12 +172,12 @@ df %>%
 # GOAL: See the overall distribution of the population.
 # TODO: choose an appropriate number of bins (start with ~50).
 
-ggplot(df, aes(x = ____)) +
-  geom_histogram(bins = ___, alpha = 0.7) +
+ggplot(df, aes(x = ta)) +
+  geom_histogram(bins = 50, alpha = 0.7) +
   theme_classic(base_size = 18) +
   labs(x = response_var, y = "Count", title = "Population distribution (histogram)")
 
-ggplot(df, aes(x = ____)) +
+ggplot(df, aes(x = ta)) +
   geom_density(alpha = 0.7) +
   theme_classic(base_size = 18) +
   labs(x = response_var, y = "Density", title = "Population distribution (density)")
@@ -184,8 +185,7 @@ ggplot(df, aes(x = ____)) +
 
 **Prompt:** Describe shape (skew, modality), center, and spread.
 
-> *Write your answer here.*
-
+> The distribution is bimodal with two different peaks in air temperature. 
 ---
 
 ## 2.3 Do latent groups explain variability? (month, day/night)
@@ -195,7 +195,7 @@ ggplot(df, aes(x = ____)) +
 ```{r pop_by_month, echo=TRUE, eval=FALSE}
 # TODO: make month appear in a sensible order (it already is an ordered factor if label=TRUE)
 df %>%
-  ggplot(aes(x = month, y = ____)) +
+  ggplot(aes(x = month, y = ta)) +
   geom_boxplot(outlier.alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(x = NULL, y = response_var, title = "Population by month")
@@ -205,7 +205,7 @@ df %>%
 
 ```{r pop_by_daynight, echo=TRUE, eval=FALSE}
 df %>%
-  ggplot(aes(x = day_night, y = ____)) +
+  ggplot(aes(x = day_night, y = ta)) +
   geom_boxplot(outlier.alpha = 0.25) +
   theme_classic(base_size = 18) +
   labs(x = NULL, y = response_var, title = "Population by day vs night")
@@ -222,8 +222,8 @@ df %>%
 Compute the population mean and SD for your chosen response variable.
 
 ```{r population_params, echo=TRUE, eval=FALSE}
-pop_mean <- mean(df____, na.rm = TRUE)
-pop_sd   <- sd(df____, na.rm = TRUE)
+pop_mean <- mean(df$ta, na.rm = TRUE)
+pop_sd   <- sd(df$ta, na.rm = TRUE)
 
 tibble(
   response_var = response_var,
@@ -242,13 +242,13 @@ tibble(
 set.seed(480)
 
 # TODO: choose a sample size (e.g., 200, 500, 1000)
-n_samp <- ___
+n_samp <- 200
 
 samp <- df %>%
   slice_sample(n = n_samp)
 
-samp_mean <- mean(samp____, na.rm = TRUE)
-samp_sd   <- sd(samp____, na.rm = TRUE)
+samp_mean <- mean(samp$ta, na.rm = TRUE)
+samp_sd   <- sd(samp$ta, na.rm = TRUE)
 
 tibble(
   n_samp = n_samp,
@@ -270,13 +270,13 @@ tibble(
 ```{r sampling_distribution, echo=TRUE, eval=FALSE}
 set.seed(480)
 
-reps <- ___   # TODO: choose number of replicates (e.g., 500 or 1000)
+reps <- 1000   # TODO: choose number of replicates (e.g., 500 or 1000)
 
 means <- replicate(
   reps,
   df %>%
     slice_sample(n = n_samp) %>%
-    summarise(m = mean(____, na.rm = TRUE)) %>%
+    summarise(m = mean(ta, na.rm = TRUE)) %>%
     pull(m)
 )
 
@@ -309,15 +309,15 @@ set.seed(480)
 
 # GOAL: sample within each month to ensure seasonal representation.
 # TODO: choose n_per_month so total sample size is reasonable (e.g., 12 * 20 = 240)
-n_per_month <- ___
+n_per_month <- 240
 
 samp_strat <- df %>%
   group_by(month) %>%
   slice_sample(n = n_per_month) %>%
   ungroup()
 
-strat_mean <- mean(samp_strat____, na.rm = TRUE)
-strat_sd   <- sd(samp_strat____, na.rm = TRUE)
+strat_mean <- mean(samp_strat$ta, na.rm = TRUE)
+strat_sd   <- sd(samp_strat$ta, na.rm = TRUE)
 
 tibble(
   n_per_month = n_per_month,
