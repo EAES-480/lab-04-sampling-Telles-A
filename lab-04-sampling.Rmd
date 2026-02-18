@@ -213,7 +213,7 @@ df %>%
 
 **Prompt (3–4 sentences):** Which grouping variable (month or day/night) seems to explain more variability in your response? Why?
 
-> *Write your answer here.*
+> The month grouping variable seems to explain more variability in my response because the distribution of boxplots matches the population distribution. 
 
 ---
 
