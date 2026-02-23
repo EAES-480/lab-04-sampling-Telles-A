@@ -213,7 +213,7 @@ df %>%
 
 **Prompt (3–4 sentences):** Which grouping variable (month or day/night) seems to explain more variability in your response? Why?
 
-> The month grouping variable seems to explain more variability in my response because the distribution of boxplots matches the population distribution. 
+> The month grouping variable seems to explain more variability in my response because the distribution of boxplots matches the population distribution. It also explains the subtle differences in air temperature compared to day and night. 
 
 ---
 
@@ -261,7 +261,7 @@ tibble(
 
 **Prompt (2–3 sentences):** How close is your one-sample estimate to the population mean/SD? Is the difference surprising?
 
-> *Write your answer here.*
+> The mean and standard deviation of the one-sample estimate is very close to the population. This is not surprising because this sample is supposed to be a representation of the population.
 
 ---
 
@@ -294,7 +294,7 @@ ggplot(tibble(mean_est = means), aes(mean_est)) +
 
 **Prompt (2–3 sentences):** Is the sampling distribution centered on the population mean? What happens if you increase `n_samp`?
 
-> *Write your answer here.*
+> The sampling distribution does seem centered on the population mean. However, when you increase the number of samples, the distribution appears more normal, still approximately centered on the population mean.
 
 ---
 
@@ -343,7 +343,7 @@ tibble(
 
 **Prompt (3–4 sentences):** Which strategy better approximated the population mean and SD for your response variable? Why might stratification help (or not) here?
 
-> *Write your answer here.*
+> The SRS was a better approximation for the mean and standard deviation for this response variable. Though stratifying by month seemed reasonable because it explained the variability of the response variable, the SRS was closer to the population mean and standard deviation. 
 
 ---
 
@@ -356,7 +356,7 @@ Answer in **4–6 sentences**:
 - In EAES field studies, when is stratification essential?
 - What is one trade-off of stratified sampling?
 
-> *Write your answer here.*
+> Seasonality is important for sampling because within the environment, changes in seasons can account for a lot of variability within a system. If sampling ignores latent grouping variables, there can be parts of the data that remains unexplained. In EaES, stratification is essential when there are distinct sub-groups that need to be represented. However, with stratified samplinga, the trade-off is the complexity it adds to a data set (vs. simple random sampling). 
 
 ---
 
